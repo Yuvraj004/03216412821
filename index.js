@@ -1,20 +1,33 @@
 const express = require('express');
 var cors = require('cors');
+const { default: axios } = require('axios');
 const app = express();
 const port = 9876;
-
+require('dotenv').config();
 app.use(express.json());
 app.use(cors());
 
 const WINDOW_SIZE =10;
-var type = "primes" ;
-var server_url  = "http://20.244.56.144/test/";
+var qname = "" ;
+var server_url  = "http://20.244.56.144/test";
 
 let queue = [];
 
 const fetchNumbers = async (type) => {
+    if (type=='p') qname = 'primes';
+    else if(type=='f') qname='fibo';
+    else if(type=='e') qname='even';
+    else if(type == 'f') qname='rand';
+    else qname = 'primes';
     try {
-      const response = await axios.get(`${server_url}/${type}`, { timeout: 500 });
+      const response = await axios.get(`${server_url}/${qname}`, { timeout: 500 },{
+        headers:{
+            "token_type": "Bearer",
+            "access_token": process.env.access_token,
+            "Content-Type":"application/json",
+        }
+      });
+      console.log(response);
       return response.data.numbers;
     } catch (error) {
       console.error('Error fetching numbers:', error.message);
